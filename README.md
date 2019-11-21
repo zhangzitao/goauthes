@@ -7,7 +7,7 @@ Most parts of this project is implemented by interface, it's so convienent to wo
 ## implementations examples
 - server
   - standard server
-  - 
+  - gin
   - ...
 - authorize
   - password mode
