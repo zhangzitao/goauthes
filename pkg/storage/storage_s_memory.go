@@ -4,9 +4,8 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"time"
 
-	"github.com/zhangzitao/goauthes/pkg/token"
+	"github.com/zhangzitao/goauthes/pkg"
 )
 
 // MemoryDB is memory store
@@ -14,7 +13,7 @@ var MemoryDB = map[string][]Memory{}
 
 // Memory is a storage specific implemention
 type Memory struct {
-	Data Base
+	Data pkg.BaseStorage
 }
 
 func makeUserSessionReady(key string) error {
@@ -61,7 +60,7 @@ func (s *Memory) Create() (bool, error) {
 }
 
 // Refresh is to delete and create data in db
-func (s *Memory) Refresh() (Storage, error) {
+func (s *Memory) Refresh() (bool, error) {
 	// delete old keys
 	// find storage in user session array
 	key := "goauthes:userid:" + s.Data.UserID
@@ -83,12 +82,7 @@ func (s *Memory) Refresh() (Storage, error) {
 	if _, ok := MemoryDB["goauthes:access:"+s.Data.Access]; ok {
 		delete(MemoryDB, "goauthes:access:"+s.Data.Access)
 	}
-	// rebuild storage
-	sto, err := s.makeNewByOld()
-	if err != nil {
-		return &sto, err
-	}
-	return &sto, nil
+	return true, nil
 }
 
 // Delete is to delete data in db
@@ -98,39 +92,7 @@ func (s *Memory) Delete() (bool, error) {
 	return true, nil
 }
 
-// ToToken is pick the token data
-func (s *Memory) ToToken() (token.Token, error) {
-	tok := token.Token{
-		AccessToken:  s.Data.Access,
-		TokenType:    s.Data.TokenType,
-		ExpiresIn:    s.Data.AccessExpiresIn,
-		RefreshToken: s.Data.Refresh,
-	}
-	return tok, nil
-}
-
-// ToAuth is pick the auth data
-func (s *Memory) makeNewByOld() (m Memory, err error) {
-	expireTime, err := strconv.Atoi(os.Getenv("GOAUTHES_TOKEN_EXPIRE"))
-	tok, err := token.GenerateToken("Bearer", int64(expireTime))
-	m.Data = Base{
-		ClientID:         s.Data.ClientID,
-		UserID:           s.Data.UserID,
-		RedirectURI:      s.Data.RedirectURI,
-		Scope:            s.Data.Scope,
-		Code:             "",
-		CodeCreateAt:     time.Now(),
-		CodeExpiresIn:    0,
-		Access:           tok.AccessToken,
-		AccessCreateAt:   time.Now(),
-		AccessExpiresIn:  tok.ExpiresIn,
-		Refresh:          tok.RefreshToken,
-		RefreshCreateAt:  time.Now(),
-		RefreshExpiresIn: 0,
-		TokenType:        tok.TokenType,
-	}
-	if err != nil {
-		return m, err
-	}
-	return m, nil
+// ToBase is
+func (s *Memory) ToBase() pkg.BaseStorage {
+	return s.Data
 }

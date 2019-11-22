@@ -6,8 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/zhangzitao/goauthes/pkg/credential"
-	"github.com/zhangzitao/goauthes/pkg/storage"
+	"github.com/zhangzitao/goauthes/factory"
 )
 
 func errorToMap(message string) (m map[string]interface{}) {
@@ -51,12 +50,12 @@ func processPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// input file to cred
-	cred, err := credential.GenerateCredential("PassWord", "PassWord", username, password, scope)
+	cred, err := factory.GenerateCredential("PassWord", "PassWord", username, password, scope)
 	if err != nil {
 		return
 	}
 	// cred to auth
-	auth, err := cred.GenerateAuthorize()
+	auth, err := factory.GenerateAuthorizeFromCredential(cred)
 	if err != nil {
 		return
 	}
@@ -73,7 +72,7 @@ func processPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// create storage interface
-	sto, err := storage.GenerateFromAuthorize("PassWord", authDone)
+	sto, err := factory.GenerateFromAuthorize(authDone)
 	if err != nil {
 		return
 	}
@@ -85,7 +84,7 @@ func processPassword(w http.ResponseWriter, r *http.Request) {
 	if !flag {
 		return
 	}
-	tok, err := sto.ToToken()
+	tok, err := factory.GenerateTokenFromStorage(sto)
 	if err != nil {
 		return
 	}
@@ -106,12 +105,18 @@ func processRefresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stoOld, err := storage.GetRefreshStorage(refreshToken)
+	stoOld, err := factory.GetRefreshStorage(refreshToken)
 	if err != nil {
 		json.NewEncoder(w).Encode(errorToMap("refresh_token wrong"))
 		return
 	}
-	sto, err := stoOld.Refresh()
+	// delete all tokens of this storage
+	_, err = stoOld.Refresh()
+	if err != nil {
+		return
+	}
+	// rebuild storage
+	sto, err := factory.MakeNewStorageByOld(stoOld)
 	if err != nil {
 		return
 	}
@@ -123,7 +128,7 @@ func processRefresh(w http.ResponseWriter, r *http.Request) {
 	if !flag {
 		return
 	}
-	tok, err := sto.ToToken()
+	tok, err := factory.GenerateTokenFromStorage(sto)
 	if err != nil {
 		return
 	}

@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/zhangzitao/goauthes"
-	"github.com/zhangzitao/goauthes/pkg/config"
+	"github.com/zhangzitao/goauthes/config"
 )
 
 func main() {

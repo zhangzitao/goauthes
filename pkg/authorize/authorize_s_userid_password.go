@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+
+	"github.com/zhangzitao/goauthes/pkg"
 )
 
 // PassWord is used for password mode of oauth2, an implemention of Authorize
@@ -17,7 +19,7 @@ type PassWord struct {
 }
 
 // Verify is switcher
-func (s *PassWord) Verify(class string) (Authorize, error) {
+func (s *PassWord) Verify(class string) (pkg.Authorize, error) {
 	switch class {
 	case "Remote":
 		return s.VerifyRemote()
@@ -28,7 +30,7 @@ func (s *PassWord) Verify(class string) (Authorize, error) {
 }
 
 // VerifyRemote the password, and wait for userid return
-func (s *PassWord) VerifyRemote() (auth Authorize, err error) {
+func (s *PassWord) VerifyRemote() (auth pkg.Authorize, err error) {
 	values := url.Values{"username": {s.UserName}, "password": {s.PassWord}, "scope": {s.Scope}}
 	// make request
 	resp, err := http.PostForm(os.Getenv("GOAUTHES_AUTHORIZE_REMOTE_VERIFY_URL"), values)
@@ -63,7 +65,7 @@ func (s *PassWord) VerifyRemote() (auth Authorize, err error) {
 }
 
 // VerifyLocal the password, local, modify this if you want to use single server
-func (s *PassWord) VerifyLocal() (Authorize, error) {
+func (s *PassWord) VerifyLocal() (pkg.Authorize, error) {
 	return s, nil
 }
 

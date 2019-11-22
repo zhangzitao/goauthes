@@ -1,9 +1,5 @@
 package credential
 
-import (
-	"github.com/zhangzitao/goauthes/pkg/authorize"
-)
-
 // InputPassWord is input data
 type InputPassWord struct {
 	GrantType string
@@ -12,8 +8,13 @@ type InputPassWord struct {
 	Scope     string
 }
 
-// GenerateAuthorize , as it's name
-func (s *InputPassWord) GenerateAuthorize() (auth authorize.Authorize, err error) {
-	auth, err = authorize.GenerateAuthorize("PassWord", s.Username, s.Password, s.Scope)
-	return auth, err
+//ToArray is
+func (s *InputPassWord) ToArray() [4]string {
+	arr := [4]string{
+		s.GrantType,
+		s.Username,
+		s.Password,
+		s.Scope,
+	}
+	return arr
 }

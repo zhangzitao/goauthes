@@ -1,9 +1,9 @@
-package storage
+package pkg
 
 import "time"
 
-// Base is storage data handler
-type Base struct {
+// BaseStorage is storage data handler
+type BaseStorage struct {
 	ClientID         string
 	UserID           string
 	RedirectURI      string
