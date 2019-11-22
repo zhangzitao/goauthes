@@ -1,35 +1,23 @@
 package storage
 
 import (
-	"time"
-
-	"github.com/zhangzitao/goauthes/pkg/authorize"
-	"github.com/zhangzitao/goauthes/pkg/token"
+	"errors"
+	"os"
 )
 
-// GenerateStorage is a facotry produce storage
-func GenerateStorage(class string, tok token.Token, auth authorize.Authorize) (sto Storage, err error) {
-	switch class {
+// GetRefreshStorage is
+func GetRefreshStorage(refreshTokey string) (sto Storage, err error) {
+	switch os.Getenv("GOAUTHES_STORAGE_TYPE") {
 	case "Memory":
-		au := auth.(*authorize.PassWord)
-		base := Base{
-			ClientID:         "",
-			UserID:           au.UserID,
-			RedirectURI:      "",
-			Scope:            au.Scope,
-			Code:             "",
-			CodeCreateAt:     time.Now(),
-			CodeExpiresIn:    0,
-			Access:           tok.AccessToken,
-			AccessCreateAt:   time.Now(),
-			AccessExpiresIn:  tok.ExpiresIn,
-			Refresh:          tok.RefreshToken,
-			RefreshCreateAt:  time.Now(),
-			RefreshExpiresIn: 0,
-			TokenType:        tok.TokenType,
-		}
-		sto = &Memory{Data: base}
+		sto, err = memoryGetRefreshStorage(refreshTokey)
 	}
-
 	return sto, err
+}
+
+func memoryGetRefreshStorage(refreshTokey string) (sto Storage, err error) {
+	if arr, ok := MemoryDB["goauthes:refresh:"+refreshTokey]; ok {
+		sto = &arr[0]
+		return sto, nil
+	}
+	return sto, errors.New("get refresh storage failed")
 }
