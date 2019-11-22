@@ -3,6 +3,8 @@ package pkg
 type (
 	// Authorize is used building & verifying the data that to be authorized
 	Authorize interface {
+		GetType() string
+		ToBasePassWord() (BasePassWord, bool)
 		Verify(string) (Authorize, error)
 		VerifyRemote() (Authorize, error)
 		VerifyLocal() (Authorize, error)
@@ -16,15 +18,9 @@ type (
 
 	// Storage is data handler
 	Storage interface {
+		ToBase() BaseStorage
 		Create() (bool, error)
 		Refresh() (bool, error)
 		Delete() (bool, error)
-		ToBase() BaseStorage
-	}
-
-	// Token is
-	Token interface {
-		Access()
-		Refresh()
 	}
 )

@@ -2,6 +2,14 @@ package pkg
 
 import "time"
 
+// BasePassWord is a authorize data
+type BasePassWord struct {
+	UserName string
+	PassWord string
+	Scope    string
+	UserID   string
+}
+
 // BaseStorage is storage data handler
 type BaseStorage struct {
 	ClientID         string

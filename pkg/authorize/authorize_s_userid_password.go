@@ -12,10 +12,8 @@ import (
 
 // PassWord is used for password mode of oauth2, an implemention of Authorize
 type PassWord struct {
-	UserName string
-	PassWord string
-	Scope    string
-	UserID   string
+	Data pkg.BasePassWord
+	Type string
 }
 
 // Verify is switcher
@@ -31,7 +29,7 @@ func (s *PassWord) Verify(class string) (pkg.Authorize, error) {
 
 // VerifyRemote the password, and wait for userid return
 func (s *PassWord) VerifyRemote() (auth pkg.Authorize, err error) {
-	values := url.Values{"username": {s.UserName}, "password": {s.PassWord}, "scope": {s.Scope}}
+	values := url.Values{"username": {s.Data.UserName}, "password": {s.Data.PassWord}, "scope": {s.Data.Scope}}
 	// make request
 	resp, err := http.PostForm(os.Getenv("GOAUTHES_AUTHORIZE_REMOTE_VERIFY_URL"), values)
 	if err != nil {
@@ -55,11 +53,12 @@ func (s *PassWord) VerifyRemote() (auth pkg.Authorize, err error) {
 		return auth, errors.New("read respond error:" + data.Message)
 	}
 	// get the id return from remote server
-	auth = &PassWord{
-		UserName: s.UserName,
-		PassWord: s.PassWord,
-		Scope:    s.Scope,
-		UserID:   data.Message,
+	auth = &PassWord{Data: pkg.BasePassWord{
+		UserName: s.Data.UserName,
+		PassWord: s.Data.PassWord,
+		Scope:    s.Data.Scope,
+		UserID:   data.Message},
+		Type: "PassWord",
 	}
 	return auth, nil
 }
@@ -71,8 +70,18 @@ func (s *PassWord) VerifyLocal() (pkg.Authorize, error) {
 
 // Verified is Check if auth verified yet
 func (s *PassWord) Verified() bool {
-	if s.UserID == "" {
+	if s.Data.UserID == "" {
 		return false
 	}
 	return true
+}
+
+// ToBasePassWord is
+func (s *PassWord) ToBasePassWord() (pkg.BasePassWord, bool) {
+	return s.Data, true
+}
+
+// GetType is
+func (s *PassWord) GetType() string {
+	return s.Type
 }

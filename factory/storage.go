@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/zhangzitao/goauthes/pkg"
-	"github.com/zhangzitao/goauthes/pkg/authorize"
 	"github.com/zhangzitao/goauthes/pkg/storage"
 	"github.com/zhangzitao/goauthes/pkg/token"
 )
@@ -30,19 +29,19 @@ func memoryGetRefreshStorage(refreshTokey string) (sto pkg.Storage, err error) {
 }
 
 // GenerateFromAuthorize save the data to storage format
-func GenerateFromAuthorize(class string, auth pkg.Authorize) (sto pkg.Storage, err error) {
+func GenerateFromAuthorize(auth pkg.Authorize) (sto pkg.Storage, err error) {
 	expireTime, err := strconv.Atoi(os.Getenv("GOAUTHES_TOKEN_EXPIRE"))
 	newToken, err := GenerateToken(os.Getenv("GOAUTHES_TOKEN_TYPE"), int64(expireTime))
-	sto, err = GenerateStorage(class, newToken, auth)
+	sto, err = GenerateStorage(newToken, auth)
 	return sto, err
 }
 
 // GenerateStorage is a facotry produce storage
-func GenerateStorage(class string, tok token.Token, auth pkg.Authorize) (sto pkg.Storage, err error) {
+func GenerateStorage(tok token.Token, auth pkg.Authorize) (sto pkg.Storage, err error) {
 	var base pkg.BaseStorage
-	switch class {
+	switch auth.GetType() {
 	case "PassWord":
-		au := auth.(*authorize.PassWord)
+		au, _ := auth.ToBasePassWord()
 		base = pkg.BaseStorage{
 			ClientID:         "",
 			UserID:           au.UserID,

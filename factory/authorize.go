@@ -15,12 +15,12 @@ func GenerateAuthorize(class string, data ...string) (auth pkg.Authorize, err er
 			err := errors.New("Generate authorize param lenth error")
 			return auth, err
 		}
-		auth = &authorize.PassWord{
+		auth = &authorize.PassWord{Data: pkg.BasePassWord{
 			UserName: data[0],
 			PassWord: data[1],
 			Scope:    data[2],
 			UserID:   "",
-		}
+		}, Type: "PassWord"}
 	case "AuthorizationCode":
 		// TODO
 	}
