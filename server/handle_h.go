@@ -72,7 +72,7 @@ func processPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// create storage interface
-	sto, err := factory.GenerateFromAuthorize(authDone)
+	sto, err := factory.GenerateFromAuthorize("PassWord", authDone)
 	if err != nil {
 		return
 	}
