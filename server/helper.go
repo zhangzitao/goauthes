@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/zhangzitao/goauthes/factory"
+	"github.com/zhangzitao/goauthes/oauth2/factory"
 )
 
 func errorToMap(message string) (m map[string]interface{}) {

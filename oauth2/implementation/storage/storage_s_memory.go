@@ -1,11 +1,10 @@
 package storage
 
 import (
-	"log"
 	"os"
 	"strconv"
 
-	"github.com/zhangzitao/goauthes/pkg"
+	base "github.com/zhangzitao/goauthes/oauth2/structs_base"
 )
 
 // MemoryDB is memory store
@@ -13,7 +12,7 @@ var MemoryDB = map[string][]Memory{}
 
 // Memory is a storage specific implemention
 type Memory struct {
-	Data pkg.BaseStorage
+	Data base.StorageData
 }
 
 func makeUserSessionReady(key string) error {
@@ -55,7 +54,7 @@ func (s *Memory) Create() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	log.Printf("%v", MemoryDB)
+	// log.Printf("%v", MemoryDB)
 	return true, nil
 }
 
@@ -93,6 +92,6 @@ func (s *Memory) Delete() (bool, error) {
 }
 
 // ToBase is
-func (s *Memory) ToBase() pkg.BaseStorage {
+func (s *Memory) ToBase() base.StorageData {
 	return s.Data
 }

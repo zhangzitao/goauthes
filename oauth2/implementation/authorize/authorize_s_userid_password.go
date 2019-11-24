@@ -7,17 +7,18 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/zhangzitao/goauthes/pkg"
+	"github.com/zhangzitao/goauthes/oauth2/interfaces"
+	base "github.com/zhangzitao/goauthes/oauth2/structs_base"
 )
 
 // PassWord is used for password mode of oauth2, an implemention of Authorize
 type PassWord struct {
-	Data pkg.BasePassWord
+	Data base.PassWordData
 	Type string
 }
 
 // Verify is switcher
-func (s *PassWord) Verify(class string) (pkg.Authorize, error) {
+func (s *PassWord) Verify(class string) (interfaces.Authorize, error) {
 	switch class {
 	case "Remote":
 		return s.VerifyRemote()
@@ -28,7 +29,7 @@ func (s *PassWord) Verify(class string) (pkg.Authorize, error) {
 }
 
 // VerifyRemote the password, and wait for userid return
-func (s *PassWord) VerifyRemote() (auth pkg.Authorize, err error) {
+func (s *PassWord) VerifyRemote() (auth interfaces.Authorize, err error) {
 	values := url.Values{"username": {s.Data.UserName}, "password": {s.Data.PassWord}, "scope": {s.Data.Scope}}
 	// make request
 	resp, err := http.PostForm(os.Getenv("GOAUTHES_AUTHORIZE_REMOTE_VERIFY_URL"), values)
@@ -53,7 +54,7 @@ func (s *PassWord) VerifyRemote() (auth pkg.Authorize, err error) {
 		return auth, errors.New("read respond error:" + data.Message)
 	}
 	// get the id return from remote server
-	auth = &PassWord{Data: pkg.BasePassWord{
+	auth = &PassWord{Data: base.PassWordData{
 		UserName: s.Data.UserName,
 		PassWord: s.Data.PassWord,
 		Scope:    s.Data.Scope,
@@ -64,7 +65,7 @@ func (s *PassWord) VerifyRemote() (auth pkg.Authorize, err error) {
 }
 
 // VerifyLocal the password, local, modify this if you want to use single server
-func (s *PassWord) VerifyLocal() (pkg.Authorize, error) {
+func (s *PassWord) VerifyLocal() (interfaces.Authorize, error) {
 	return s, nil
 }
 
@@ -77,7 +78,7 @@ func (s *PassWord) Verified() bool {
 }
 
 // ToBasePassWord is
-func (s *PassWord) ToBasePassWord() (pkg.BasePassWord, bool) {
+func (s *PassWord) ToBasePassWord() (base.PassWordData, bool) {
 	return s.Data, true
 }
 

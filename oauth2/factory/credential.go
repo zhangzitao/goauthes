@@ -4,17 +4,17 @@ import (
 	"errors"
 	"log"
 
-	"github.com/zhangzitao/goauthes/pkg"
-	"github.com/zhangzitao/goauthes/pkg/credential"
+	"github.com/zhangzitao/goauthes/oauth2/implementation/credential"
+	"github.com/zhangzitao/goauthes/oauth2/interfaces"
 )
 
 // GenerateCredential is factory function
-func GenerateCredential(class string, data ...string) (cred pkg.Credential, err error) {
+func GenerateCredential(class string, data ...string) (cred interfaces.Credential, err error) {
 	switch class {
 	case "PassWord":
 		if len(data) != 4 {
 			err = errors.New("Generate Credential param lenth error")
-			log.Println("error:", err)
+			log.Println("info:", err)
 			return cred, err
 		}
 		cred = &credential.InputPassWord{

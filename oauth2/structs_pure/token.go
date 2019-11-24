@@ -1,4 +1,4 @@
-package token
+package structs
 
 // Token is a
 type Token struct {
